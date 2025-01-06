@@ -9,7 +9,7 @@ body{
 	color:#000
 }
 h1,h2,h3,dt,small,.small,footer,label,cite,div.blogparent,input[type="submit"]{
-	font-family:valkyrie_c4;
+	font-family:Verdana, Geneva, Tahoma, sans-serif,serif;
 	font-weight:normal;
 	font-style:normal
 }
