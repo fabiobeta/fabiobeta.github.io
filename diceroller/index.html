@@ -1318,46 +1318,81 @@
             // Check if there's a d20 in the pool
             const hasD20 = currentPool.some(dice => dice.sides === 20);
             
-            // Calculate base success probability (excluding natural 1 and 20 for d20s)
-            probabilities.forEach((prob, result) => {
-                if (result >= target) {
-                    successProb += prob;
-                }
-            });
-
-            // Handle critical success/failure for d20s
             if (hasD20) {
+                // For d20 rolls, we need to handle critical success/failure separately
                 const d20Count = currentPool.filter(dice => dice.sides === 20)
                                          .reduce((sum, dice) => sum + dice.count, 0);
                 
-                if (rollType !== 'normal') {
-                    // Advantage/Disadvantage calculations
-                    if (rollType === 'advantage') {
-                        criticalSuccessProb = 1 - Math.pow(19/20, 2); // Chance of at least one 20
-                        criticalFailureProb = 1/400; // Need both to be 1
-                    } else { // disadvantage
-                        criticalSuccessProb = 1/400; // Need both to be 20
-                        criticalFailureProb = 1 - Math.pow(19/20, 2); // Chance of at least one 1
+                if (rollType === 'normal') {
+                    // Calculate probabilities for normal rolls
+                    criticalSuccessProb = 1/20;  // Probability of rolling a 20
+                    criticalFailureProb = 1/20;  // Probability of rolling a 1
+                    
+                    // Calculate success probability excluding critical rolls
+                    if (critSuccess.checked && critFailure.checked) {
+                        // Count successes from 2-19
+                        for (let roll = 2; roll <= 19; roll++) {
+                            if (roll + parseInt(modifier.value) >= target) {
+                                successProb += 1/20;
+                            }
+                        }
+                        // Add critical success (20 always succeeds)
+                        successProb += criticalSuccessProb;
+                        // Natural 1 always fails
+                    } else if (critSuccess.checked) {
+                        // Count successes from 2-19
+                        for (let roll = 2; roll <= 19; roll++) {
+                            if (roll + parseInt(modifier.value) >= target) {
+                                successProb += 1/20;
+                            }
+                        }
+                        // Add critical success
+                        successProb += criticalSuccessProb;
+                    } else if (critFailure.checked) {
+                        // Count successes from 2-20
+                        for (let roll = 2; roll <= 20; roll++) {
+                            if (roll + parseInt(modifier.value) >= target) {
+                                successProb += 1/20;
+                            }
+                        }
+                        // Natural 1 always fails (already excluded)
+                    } else {
+                        // No critical rules, straight calculation
+                        for (let roll = 1; roll <= 20; roll++) {
+                            if (roll + parseInt(modifier.value) >= target) {
+                                successProb += 1/20;
+                            }
+                        }
                     }
                 } else {
-                    // Normal roll
-                    criticalSuccessProb = d20Count * (1/20); // Probability of rolling a 20
-                    criticalFailureProb = d20Count * (1/20); // Probability of rolling a 1
+                    // Handle advantage/disadvantage
+                    if (rollType === 'advantage') {
+                        criticalSuccessProb = 1 - Math.pow(19/20, 2);  // Chance of at least one 20
+                        criticalFailureProb = 1/400;  // Need both to be 1
+                        
+                        // Calculate success probability for advantage
+                        const singleRollFailChance = (target - 1 - parseInt(modifier.value)) / 20;
+                        successProb = 1 - Math.pow(Math.max(0, Math.min(1, singleRollFailChance)), 2);
+                    } else { // disadvantage
+                        criticalSuccessProb = 1/400;  // Need both to be 20
+                        criticalFailureProb = 1 - Math.pow(19/20, 2);  // Chance of at least one 1
+                        
+                        // Calculate success probability for disadvantage
+                        const singleRollSuccessChance = (21 - Math.max(1, target - parseInt(modifier.value))) / 20;
+                        successProb = Math.pow(Math.max(0, Math.min(1, singleRollSuccessChance)), 2);
+                    }
                 }
-
-                if (critSuccess.checked && target > 20) {
-                    // Add cases where natural 20 succeeds despite being below target
-                    successProb = successProb + (criticalSuccessProb * (1 - successProb));
-                }
-                
-                if (critFailure.checked && target <= 1) {
-                    // Remove cases where natural 1 fails despite being above target
-                    successProb = successProb - criticalFailureProb;
-                }
+            } else {
+                // Non-d20 rolls - use the provided probabilities
+                probabilities.forEach((prob, result) => {
+                    if (result >= target) {
+                        successProb += prob;
+                    }
+                });
             }
 
             return {
-                total: successProb,
+                total: Math.max(0, Math.min(1, successProb)),
                 criticalSuccess: criticalSuccessProb,
                 criticalFailure: criticalFailureProb
             };
@@ -1406,21 +1441,44 @@
             const data = sortedResults.map(([, prob]) => (prob * 100).toFixed(2));
 
             // Define colors
-            const successColor = 'rgba(75, 181, 67, 0.6)';     // Soft green
-            const failureColor = 'rgba(214, 69, 65, 0.6)';     // Soft red
-            const successBorder = 'rgba(75, 181, 67, 1)';      // Solid green
-            const failureBorder = 'rgba(214, 69, 65, 1)';      // Solid red
+            const successColor = 'rgba(75, 181, 67, 0.6)';      // Soft green
+            const failureColor = 'rgba(214, 69, 65, 0.6)';      // Soft red
+            const critSuccessColor = 'rgba(255, 215, 0, 0.6)';  // Gold
+            const critFailColor = 'rgba(128, 0, 0, 0.6)';       // Dark red
+            
+            const successBorder = 'rgba(75, 181, 67, 1)';
+            const failureBorder = 'rgba(214, 69, 65, 1)';
+            const critSuccessBorder = 'rgba(255, 215, 0, 1)';
+            const critFailBorder = 'rgba(128, 0, 0, 1)';
 
-            // Create color arrays based on target number
+            // Create color arrays based on target number and critical rules
             const backgroundColor = data.map((_, index) => {
                 const value = parseInt(labels[index]);
+                const hasD20 = currentPool.some(dice => dice.sides === 20);
+                
                 if (!target) return 'rgba(33, 150, 243, 0.6)'; // Default blue if no target
+                
+                if (hasD20 && value === 1 && critFailure.checked) {
+                    return critFailColor; // Critical failure
+                }
+                if (hasD20 && value === 20 && critSuccess.checked) {
+                    return critSuccessColor; // Critical success
+                }
                 return value >= target ? successColor : failureColor;
             });
 
             const borderColor = data.map((_, index) => {
                 const value = parseInt(labels[index]);
+                const hasD20 = currentPool.some(dice => dice.sides === 20);
+                
                 if (!target) return 'rgba(33, 150, 243, 1)'; // Default blue if no target
+                
+                if (hasD20 && value === 1 && critFailure.checked) {
+                    return critFailBorder; // Critical failure
+                }
+                if (hasD20 && value === 20 && critSuccess.checked) {
+                    return critSuccessBorder; // Critical success
+                }
                 return value >= target ? successBorder : failureBorder;
             });
 
@@ -1450,9 +1508,7 @@
                     },
                     plugins: {
                         legend: {
-                            labels: {
-                                color: 'rgba(255, 255, 255, 0.8)'
-                            }
+                            display: false
                         },
                         title: {
                             display: true,
@@ -1460,6 +1516,24 @@
                             color: 'rgba(255, 255, 255, 0.8)',
                             font: {
                                 size: 16
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = parseInt(context.label);
+                                    const hasD20 = currentPool.some(dice => dice.sides === 20);
+                                    let label = `Probability: ${context.formattedValue}%`;
+                                    
+                                    if (hasD20) {
+                                        if (value === 1 && critFailure.checked) {
+                                            label += ' (Critical Failure)';
+                                        } else if (value === 20 && critSuccess.checked) {
+                                            label += ' (Critical Success)';
+                                        }
+                                    }
+                                    return label;
+                                }
                             }
                         }
                     },
