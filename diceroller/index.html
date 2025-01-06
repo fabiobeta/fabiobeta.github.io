@@ -185,14 +185,41 @@
         }
 
         .dice-button {
-            padding: 10px;
-            font-size: 16px;
-            cursor: pointer;
-            border: none;
-            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
-            transition: all 0.3s ease;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dice-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .remove-dice {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            margin-left: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .remove-dice:hover {
+            background: rgba(214, 69, 65, 0.6);
+            color: white;
         }
 
         .dice-button[data-sides="4"] { background: var(--d4-color); }
@@ -904,29 +931,58 @@
         }
 
         function updateDicePoolDisplay() {
-            // Clear existing pool display (except the "Current Pool:" text and clear button)
-            while (dicePool.children.length > 1) {
-                dicePool.removeChild(dicePool.lastChild);
+            dicePool.innerHTML = '';
+            if (currentPool.length === 0) {
+                chartContainer.style.display = 'none';
+                probabilitySummary.style.display = 'none';
+                return;
             }
 
-            // Add each dice group
-            currentPool.forEach((dice, index) => {
-                const diceElement = document.createElement('span');
-                diceElement.className = 'dice-pool-item';
-                diceElement.innerHTML = `${dice.count}d${dice.sides} <span class="remove">×</span>`;
-                diceElement.querySelector('.remove').addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    currentPool.splice(index, 1);
-                    updateDicePoolDisplay();
+            currentPool.forEach(dice => {
+                const diceButton = document.createElement('div');
+                diceButton.className = 'dice-button';
+                
+                const diceText = document.createElement('span');
+                diceText.textContent = `${dice.count}d${dice.sides}`;
+                diceButton.appendChild(diceText);
+                
+                const removeButton = document.createElement('span');
+                removeButton.className = 'remove-dice';
+                removeButton.innerHTML = '×';
+                removeButton.title = 'Remove die';
+                
+                removeButton.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent event bubbling
+                    removeDice(dice.sides);
+                    if (currentPool.length === 0) {
+                        chartContainer.style.display = 'none';
+                        probabilitySummary.style.display = 'none';
+                    }
                 });
-                dicePool.appendChild(diceElement);
+                
+                diceButton.appendChild(removeButton);
+                dicePool.appendChild(diceButton);
             });
+        }
+
+        function removeDice(sides) {
+            const index = currentPool.findIndex(dice => dice.sides === sides);
+            if (index !== -1) {
+                if (currentPool[index].count > 1) {
+                    currentPool[index].count--;
+                } else {
+                    currentPool.splice(index, 1);
+                }
+                updateDicePoolDisplay();
+                updateChart();
+            }
         }
 
         clearPool.addEventListener('click', () => {
             currentPool = [];
             updateDicePoolDisplay();
             chartContainer.style.display = 'none';
+            result.textContent = '';
         });
 
         function initializeAdvantageButtons() {
@@ -948,37 +1004,39 @@
         }
 
         function checkCritical(rolls, total, target) {
-            // Only check criticals if there's a d20 in the pool
-            const hasD20 = currentPool.some(dice => dice.sides === 20);
-            if (!hasD20) return null;
-
-            // Find the d20 roll(s)
+            if (!target) return null;
+            
+            // Find d20 rolls only
             const d20Rolls = [];
+            let currentIndex = 0;
+            
             currentPool.forEach(dice => {
                 if (dice.sides === 20) {
-                    if (rollType !== 'normal') {
-                        // For advantage/disadvantage, both rolls are relevant
-                        const [roll1, roll2] = rolls.slice(-2);
-                        d20Rolls.push(roll1, roll2);
-                    } else {
-                        // For normal rolls, add all d20 results
-                        for (let i = 0; i < dice.count; i++) {
-                            d20Rolls.push(rolls[i]);
-                        }
+                    for (let i = 0; i < dice.count; i++) {
+                        d20Rolls.push(rolls[currentIndex + i]);
                     }
                 }
+                currentIndex += dice.count;
             });
-
-            // Check for critical success (natural 20)
-            if (critSuccess.checked && d20Rolls.includes(20)) {
-                return 'critical-success';
+            
+            // Only check critical success/failure for d20 rolls
+            if (d20Rolls.length > 0) {
+                if (rollType === 'advantage') {
+                    const highest = Math.max(...d20Rolls);
+                    if (critSuccess.checked && highest === 20) return 'critical-success';
+                    if (critFailure.checked && d20Rolls.every(r => r === 1)) return 'critical-failure';
+                } else if (rollType === 'disadvantage') {
+                    const lowest = Math.min(...d20Rolls);
+                    if (critSuccess.checked && d20Rolls.every(r => r === 20)) return 'critical-success';
+                    if (critFailure.checked && lowest === 1) return 'critical-failure';
+                } else {
+                    // Normal rolls
+                    if (critSuccess.checked && d20Rolls.includes(20)) return 'critical-success';
+                    if (critFailure.checked && d20Rolls.includes(1)) return 'critical-failure';
+                }
             }
-
-            // Check for critical failure (natural 1)
-            if (critFailure.checked && d20Rolls.includes(1)) {
-                return 'critical-failure';
-            }
-
+            
+            // Regular success/failure check
             return null;
         }
 
@@ -1548,6 +1606,13 @@
         });
 
         modifier.addEventListener('change', () => {
+            if (currentPool.length > 0) {
+                updateChart();
+            }
+        });
+
+        // Also handle input event for real-time updates
+        modifier.addEventListener('input', () => {
             if (currentPool.length > 0) {
                 updateChart();
             }
