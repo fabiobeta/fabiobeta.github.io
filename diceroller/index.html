@@ -1441,44 +1441,21 @@
             const data = sortedResults.map(([, prob]) => (prob * 100).toFixed(2));
 
             // Define colors
-            const successColor = 'rgba(75, 181, 67, 0.6)';      // Soft green
-            const failureColor = 'rgba(214, 69, 65, 0.6)';      // Soft red
-            const critSuccessColor = 'rgba(255, 215, 0, 0.6)';  // Gold
-            const critFailColor = 'rgba(128, 0, 0, 0.6)';       // Dark red
-            
-            const successBorder = 'rgba(75, 181, 67, 1)';
-            const failureBorder = 'rgba(214, 69, 65, 1)';
-            const critSuccessBorder = 'rgba(255, 215, 0, 1)';
-            const critFailBorder = 'rgba(128, 0, 0, 1)';
+            const successColor = 'rgba(75, 181, 67, 0.6)';     // Soft green
+            const failureColor = 'rgba(214, 69, 65, 0.6)';     // Soft red
+            const successBorder = 'rgba(75, 181, 67, 1)';      // Solid green
+            const failureBorder = 'rgba(214, 69, 65, 1)';      // Solid red
 
-            // Create color arrays based on target number and critical rules
+            // Create color arrays based on target number
             const backgroundColor = data.map((_, index) => {
                 const value = parseInt(labels[index]);
-                const hasD20 = currentPool.some(dice => dice.sides === 20);
-                
                 if (!target) return 'rgba(33, 150, 243, 0.6)'; // Default blue if no target
-                
-                if (hasD20 && value === 1 && critFailure.checked) {
-                    return critFailColor; // Critical failure
-                }
-                if (hasD20 && value === 20 && critSuccess.checked) {
-                    return critSuccessColor; // Critical success
-                }
                 return value >= target ? successColor : failureColor;
             });
 
             const borderColor = data.map((_, index) => {
                 const value = parseInt(labels[index]);
-                const hasD20 = currentPool.some(dice => dice.sides === 20);
-                
                 if (!target) return 'rgba(33, 150, 243, 1)'; // Default blue if no target
-                
-                if (hasD20 && value === 1 && critFailure.checked) {
-                    return critFailBorder; // Critical failure
-                }
-                if (hasD20 && value === 20 && critSuccess.checked) {
-                    return critSuccessBorder; // Critical success
-                }
                 return value >= target ? successBorder : failureBorder;
             });
 
