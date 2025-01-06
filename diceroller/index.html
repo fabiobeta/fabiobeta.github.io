@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RPG Dice Roller</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --d4-color: #FF5252;
+            --d6-color: #FF9800;
+            --d8-color: #FFEB3B;
+            --d10-color: #4CAF50;
+            --d12-color: #2196F3;
+            --d20-color: #9C27B0;
+            --d100-color: #607D8B;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+            color: #ffffff;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+            max-width: 1200px;
+            width: 95%;
+            margin: 10px auto;
+            background: none;
+            box-shadow: none;
+            padding: 0;
+        }
+
+        .main-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .history-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            height: calc(100vh - 40px);
+            position: sticky;
+            top: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .history-section h3 {
+            margin: 0 0 15px 0;
+            padding: 0;
+        }
+
+        .history {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin: -5px;
+            padding: 5px;
+        }
+
+        .history-section .history {
+            height: auto;
+            max-height: none;
+        }
+
+        .history-entry {
+            background: rgba(255, 255, 255, 0.05);
+            margin: 5px 0;
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .history-entry:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .history-entry .roll-info {
+            font-family: 'Consolas', monospace;
+            color: #e0e0e0;
+        }
+
+        .history-entry .roll-result {
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .history-section {
+                height: 500px;
+                position: static;
+            }
+
+            .history {
+                height: calc(100% - 40px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 98%;
+                margin: 5px auto;
+            }
+        }
+
+        h2 {
+            text-align: center;
+            color: #ffffff;
+            margin: 10px 0 15px 0;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 1.5rem;
+        }
+
+        .dice-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .select-wrapper {
+            position: relative;
+            width: 80px;
+        }
+
+        .select-wrapper select {
+            width: 100%;
+            padding: 8px;
+            font-size: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: center;
+            appearance: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .select-wrapper::after {
+            content: '▼';
+            font-size: 12px;
+            color: white;
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .select-wrapper select:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .select-wrapper select option {
+            background: #2d2d2d;
+            color: white;
+        }
+
+        .dice-button {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            transition: all 0.3s ease;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .dice-button[data-sides="4"] { background: var(--d4-color); }
+        .dice-button[data-sides="6"] { background: var(--d6-color); }
+        .dice-button[data-sides="8"] { background: var(--d8-color); }
+        .dice-button[data-sides="10"] { background: var(--d10-color); }
+        .dice-button[data-sides="12"] { background: var(--d12-color); }
+        .dice-button[data-sides="20"] { background: var(--d20-color); }
+        .dice-button[data-sides="100"] { background: var(--d100-color); }
+
+        .dice-button:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .dice-button.selected {
+            transform: scale(0.95);
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .dice-pool {
+            margin: 15px 0;
+            padding: 10px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .dice-pool-item {
+            display: inline-block;
+            margin: 3px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: popIn 0.3s ease;
+            font-size: 14px;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .dice-pool-item .remove {
+            margin-left: 8px;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .dice-pool-item .remove:hover {
+            opacity: 1;
+        }
+
+        .roll-options {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 15px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .advantage-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .advantage-button {
+            padding: 8px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .advantage-button.selected {
+            background: #2196F3;
+            transform: scale(0.95);
+        }
+
+        #rollButton {
+            width: 100%;
+            padding: 15px;
+            font-size: 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 15px 0;
+        }
+
+        #rollButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        #rollButton:active {
+            transform: translateY(1px);
+        }
+
+        #result {
+            font-size: 28px;
+            margin: 15px 0;
+            min-height: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .roll-main {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .roll-details {
+            font-size: 0.6em;
+            opacity: 0.8;
+            font-family: monospace;
+        }
+
+        .history {
+            max-height: 150px;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow-y: auto;
+            font-size: 14px;
+        }
+
+        .history div {
+            padding: 8px;
+            margin: 3px 0;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .history div:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .clear-pool {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .clear-pool:hover {
+            background: #d32f2f;
+            transform: translateY(-1px);
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Color each dice type in the pool */
+        .dice-pool-item[data-sides="4"] { background: var(--d4-color); }
+        .dice-pool-item[data-sides="6"] { background: var(--d6-color); }
+        .dice-pool-item[data-sides="8"] { background: var(--d8-color); }
+        .dice-pool-item[data-sides="10"] { background: var(--d10-color); }
+        .dice-pool-item[data-sides="12"] { background: var(--d12-color); }
+        .dice-pool-item[data-sides="20"] { background: var(--d20-color); }
+        .dice-pool-item[data-sides="100"] { background: var(--d100-color); }
+
+        #oddsButton {
+            width: 100%;
+            padding: 15px;
+            font-size: 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #9C27B0, #673AB7);
+            color: white;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 10px 0;
+        }
+
+        #oddsButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(156, 39, 176, 0.4);
+        }
+
+        #oddsButton:active {
+            transform: translateY(1px);
+        }
+
+        #chartContainer {
+            height: 300px;
+            margin: 15px 0;
+        }
+
+        /* Media queries for smaller screens */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                margin: 5px;
+            }
+
+            .dice-selector {
+                grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+                gap: 6px;
+            }
+
+            .dice-button {
+                padding: 8px;
+                font-size: 14px;
+            }
+
+            .roll-options {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .advantage-buttons {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 5px;
+            }
+
+            #chartContainer {
+                height: 250px;
+            }
+        }
+
+        /* Media query for very small screens */
+        @media (max-height: 900px) {
+            .container {
+                max-height: 85vh;
+            }
+
+            #chartContainer {
+                height: 200px;
+            }
+
+            .history {
+                max-height: 100px;
+            }
+
+            .dice-pool {
+                max-height: 80px;
+            }
+        }
+
+        /* Optimize for 1440x900 */
+        @media (max-height: 900px) and (min-width: 1440px) {
+            .container {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                grid-gap: 20px;
+                max-width: 1300px;
+            }
+
+            .controls-section {
+                grid-column: 1;
+            }
+
+            .results-section {
+                grid-column: 2;
+            }
+
+            #chartContainer {
+                height: 300px;
+            }
+        }
+
+        .roll-option-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .success {
+            color: #4CAF50 !important;
+            text-shadow: 0 0 10px rgba(76, 175, 80, 0.3) !important;
+            animation: successPulse 0.5s ease;
+        }
+
+        .failure {
+            color: #f44336 !important;
+            text-shadow: 0 0 10px rgba(244, 67, 54, 0.3) !important;
+            animation: failurePulse 0.5s ease;
+        }
+
+        @keyframes successPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes failurePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* Update media query for roll-options */
+        @media (max-width: 768px) {
+            .roll-options {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .roll-option-group {
+                justify-content: center;
+            }
+        }
+
+        .d20-rules {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .toggle-container input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 40px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-container input[type="checkbox"]::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-container input[type="checkbox"]:checked {
+            background: #4CAF50;
+        }
+
+        .toggle-container input[type="checkbox"]:checked::before {
+            transform: translateX(20px);
+        }
+
+        .toggle-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .critical-success {
+            color: #FFD700 !important;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5) !important;
+            animation: criticalPulse 0.8s ease;
+        }
+
+        .critical-failure {
+            color: #8B0000 !important;
+            text-shadow: 0 0 10px rgba(139, 0, 0, 0.5) !important;
+            animation: criticalPulse 0.8s ease;
+        }
+
+        @keyframes criticalPulse {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.3); }
+            50% { transform: scale(1); }
+            75% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 768px) {
+            .d20-rules {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        .number-input {
+            width: 60px;
+            padding: 8px;
+            font-size: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .number-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Remove arrows from number input */
+        .number-input::-webkit-outer-spin-button,
+        .number-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .number-input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        /* Update select-wrapper for number inputs */
+        .select-wrapper {
+            position: relative;
+            width: auto;
+        }
+
+        .select-wrapper::after {
+            display: none; /* Remove dropdown arrow */
+        }
+
+        .probability-summary {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            text-align: center;
+            font-size: 16px;
+            display: none; /* Hidden by default */
+        }
+
+        .probability-detail {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 8px;
+        }
+
+        .d20-settings {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .d20-settings h4 {
+            color: rgba(255, 255, 255, 0.9);
+            margin: 0 0 12px 0;
+            text-align: center;
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .advantage-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .adv-button {
+            flex: 1;
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .adv-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .adv-button.selected {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            color: white;
+        }
+
+        .d20-rules {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .d20-settings {
+                padding: 12px;
+            }
+
+            .advantage-buttons {
+                flex-direction: column;
+            }
+
+            .adv-button {
+                width: 100%;
+            }
+        }
+
+        /* Add styles for history entries */
+        .history-entry {
+            transition: all 0.2s ease;
+        }
+        
+        .history-entry:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+        
+        .history-entry:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-section">
+            <div class="controls-section">
+                <h2>Build Your Dice Pool</h2>
+                <div class="dice-selector">
+                    <div class="select-wrapper">
+                        <select id="diceCount">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                        </select>
+                    </div>
+                    <button class="dice-button" data-sides="20">D20</button>
+                    <button class="dice-button" data-sides="4">D4</button>
+                    <button class="dice-button" data-sides="6">D6</button>
+                    <button class="dice-button" data-sides="8">D8</button>
+                    <button class="dice-button" data-sides="10">D10</button>
+                    <button class="dice-button" data-sides="12">D12</button>
+                    <button class="dice-button" data-sides="100">D100</button>
+                </div>
+                <div class="dice-pool" id="dicePool">
+                    <div>Current Pool: <button class="clear-pool" id="clearPool">Clear</button></div>
+                </div>
+                <div class="roll-options">
+                    <div class="roll-option-group">
+                        <span class="modifier-label">Modifier:</span>
+                        <div class="select-wrapper">
+                            <select id="modifier">
+                                <option value="-12">-12</option>
+                                <option value="-11">-11</option>
+                                <option value="-10">-10</option>
+                                <option value="-9">-9</option>
+                                <option value="-8">-8</option>
+                                <option value="-7">-7</option>
+                                <option value="-6">-6</option>
+                                <option value="-5">-5</option>
+                                <option value="-4">-4</option>
+                                <option value="-3">-3</option>
+                                <option value="-2">-2</option>
+                                <option value="-1">-1</option>
+                                <option value="0" selected>0</option>
+                                <option value="1">+1</option>
+                                <option value="2">+2</option>
+                                <option value="3">+3</option>
+                                <option value="4">+4</option>
+                                <option value="5">+5</option>
+                                <option value="6">+6</option>
+                                <option value="7">+7</option>
+                                <option value="8">+8</option>
+                                <option value="9">+9</option>
+                                <option value="10">+10</option>
+                                <option value="11">+11</option>
+                                <option value="12">+12</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="roll-option-group">
+                        <span class="modifier-label">Target:</span>
+                        <div class="select-wrapper">
+                            <input type="number" 
+                                   id="targetNumber" 
+                                   class="number-input" 
+                                   placeholder="DC" 
+                                   min="1" 
+                                   max="99">
+                        </div>
+                    </div>
+
+                    <div class="d20-settings">
+                        <h4>d20 Rules</h4>
+                        <div class="advantage-buttons">
+                            <button id="normal" class="adv-button selected">Normal</button>
+                            <button id="advantage" class="adv-button">Advantage</button>
+                            <button id="disadvantage" class="adv-button">Disadvantage</button>
+                        </div>
+                        <div class="d20-rules">
+                            <label class="toggle-container">
+                                <input type="checkbox" id="critSuccess" checked>
+                                <span class="toggle-label">Nat 20 Always Succeeds</span>
+                            </label>
+                            <label class="toggle-container">
+                                <input type="checkbox" id="critFailure" checked>
+                                <span class="toggle-label">Nat 1 Always Fails</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <button id="rollButton">Roll Dice</button>
+                <div id="result"></div>
+                <div id="chartContainer">
+                    <canvas id="oddsChart"></canvas>
+                </div>
+                <div id="probabilitySummary" class="probability-summary"></div>
+            </div>
+        </div>
+        
+        <div class="history-section">
+            <h3>Roll History</h3>
+            <div class="history"></div>
+        </div>
+    </div>
+
+    <script>
+        const diceButtons = document.querySelectorAll('.dice-button');
+        const rollButton = document.getElementById('rollButton');
+        const result = document.getElementById('result');
+        const history = document.querySelector('.history');
+        const diceCount = document.getElementById('diceCount');
+        const modifier = document.getElementById('modifier');
+        const advantageButtons = document.querySelectorAll('.advantage-button');
+        const dicePool = document.getElementById('dicePool');
+        const clearPool = document.getElementById('clearPool');
+        const targetNumber = document.getElementById('targetNumber');
+        const critSuccess = document.getElementById('critSuccess');
+        const critFailure = document.getElementById('critFailure');
+        let rollType = 'normal';
+        let currentPool = [];
+
+        diceButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const count = parseInt(diceCount.value) || 1;
+                const sides = parseInt(button.dataset.sides);
+                addToDicePool(count, sides);
+                updateChart();
+            });
+        });
+
+        function addToDicePool(count, sides) {
+            currentPool.push({ count, sides });
+            updateDicePoolDisplay();
+            updateChart();
+        }
+
+        function updateDicePoolDisplay() {
+            // Clear existing pool display (except the "Current Pool:" text and clear button)
+            while (dicePool.children.length > 1) {
+                dicePool.removeChild(dicePool.lastChild);
+            }
+
+            // Add each dice group
+            currentPool.forEach((dice, index) => {
+                const diceElement = document.createElement('span');
+                diceElement.className = 'dice-pool-item';
+                diceElement.innerHTML = `${dice.count}d${dice.sides} <span class="remove">×</span>`;
+                diceElement.querySelector('.remove').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    currentPool.splice(index, 1);
+                    updateDicePoolDisplay();
+                });
+                dicePool.appendChild(diceElement);
+            });
+        }
+
+        clearPool.addEventListener('click', () => {
+            currentPool = [];
+            updateDicePoolDisplay();
+            chartContainer.style.display = 'none';
+        });
+
+        function initializeAdvantageButtons() {
+            const advantageButtons = document.querySelectorAll('.adv-button');
+            advantageButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    advantageButtons.forEach(btn => btn.classList.remove('selected'));
+                    button.classList.add('selected');
+                    rollType = button.id;
+                    if (currentPool.length > 0) {
+                        updateChart();
+                    }
+                });
+            });
+        }
+
+        function rollSingleDie(sides) {
+            return Math.floor(Math.random() * sides) + 1;
+        }
+
+        function checkCritical(rolls, total, target) {
+            // Only check criticals if there's a d20 in the pool
+            const hasD20 = currentPool.some(dice => dice.sides === 20);
+            if (!hasD20) return null;
+
+            // Find the d20 roll(s)
+            const d20Rolls = [];
+            currentPool.forEach(dice => {
+                if (dice.sides === 20) {
+                    if (rollType !== 'normal') {
+                        // For advantage/disadvantage, both rolls are relevant
+                        const [roll1, roll2] = rolls.slice(-2);
+                        d20Rolls.push(roll1, roll2);
+                    } else {
+                        // For normal rolls, add all d20 results
+                        for (let i = 0; i < dice.count; i++) {
+                            d20Rolls.push(rolls[i]);
+                        }
+                    }
+                }
+            });
+
+            // Check for critical success (natural 20)
+            if (critSuccess.checked && d20Rolls.includes(20)) {
+                return 'critical-success';
+            }
+
+            // Check for critical failure (natural 1)
+            if (critFailure.checked && d20Rolls.includes(1)) {
+                return 'critical-failure';
+            }
+
+            return null;
+        }
+
+        function formatRollDescription(dicePool, modifier) {
+            // Sort dice by sides (d20 first, then descending)
+            const sortedPool = [...dicePool].sort((a, b) => {
+                if (a.sides === 20) return -1;
+                if (b.sides === 20) return 1;
+                return b.sides - a.sides;
+            });
+
+            // Group identical dice
+            const groupedDice = sortedPool.reduce((acc, dice) => {
+                const key = dice.sides;
+                if (!acc[key]) acc[key] = 0;
+                acc[key] += dice.count;
+                return acc;
+            }, {});
+
+            // Format dice groups, ensuring d20s come first
+            const diceStrings = Object.entries(groupedDice)
+                .sort((a, b) => {
+                    if (parseInt(a[0]) === 20) return -1;
+                    if (parseInt(b[0]) === 20) return 1;
+                    return parseInt(b[0]) - parseInt(a[0]);
+                })
+                .map(([sides, count]) => {
+                    if (count === 1) return `d${sides}`;
+                    return `${count}d${sides}`;
+                });
+
+            // Add modifier if any
+            let rollString = diceStrings.join('+');
+            if (modifier > 0) rollString += `+${modifier}`;
+            if (modifier < 0) rollString += modifier;
+
+            return rollString;
+        }
+
+        function addToHistory(rolls, total, modValue, target, criticalResult, rollType) {
+            const historyEntry = document.createElement('div');
+            historyEntry.className = 'history-entry';
+            
+            // Create roll information with new format
+            const rollInfo = document.createElement('div');
+            rollInfo.className = 'roll-info';
+            rollInfo.textContent = formatRollDescription(currentPool, modValue);
+            
+            // Create result section
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'roll-result';
+            
+            let resultText = `${total}`;
+            if (target) {
+                resultText += ` vs ${target}`;
+            }
+            
+            // Add success/failure indicator
+            if (criticalResult === 'critical-success') {
+                resultText += ' ⚔️'; // Critical success icon
+            } else if (criticalResult === 'critical-failure') {
+                resultText += ' 💀'; // Critical failure icon
+            } else if (target) {
+                resultText += total >= target ? ' ✓' : ' ✗';
+            }
+            
+            resultDiv.textContent = resultText;
+
+            // Apply appropriate styling
+            if (criticalResult) {
+                resultDiv.classList.add(criticalResult);
+            } else if (target) {
+                resultDiv.classList.add(total >= target ? 'success' : 'failure');
+            }
+
+            // Assemble the entry
+            historyEntry.appendChild(rollInfo);
+            historyEntry.appendChild(resultDiv);
+            
+            // Add to history
+            history.insertBefore(historyEntry, history.firstChild);
+
+            // Limit history to last 50 rolls
+            while (history.children.length > 50) {
+                history.removeChild(history.lastChild);
+            }
+        }
+
+        function createHistoryEntry(rollDescription, total, target, criticalResult, rollType, currentConfig) {
+            const historyEntry = document.createElement('div');
+            historyEntry.className = 'history-entry';
+            
+            const rollInfo = document.createElement('div');
+            rollInfo.className = 'roll-info';
+            rollInfo.textContent = `${rollDescription} = ${total}`;
+            
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'roll-result';
+            if (criticalResult) {
+                resultDiv.classList.add(criticalResult);
+            } else if (target) {
+                resultDiv.classList.add(total >= target ? 'success' : 'failure');
+            }
+            
+            let resultString = `${total}`;
+            if (target) {
+                resultString += ` vs ${target}`;
+            }
+            resultDiv.textContent = resultString;
+            
+            historyEntry.appendChild(rollInfo);
+            historyEntry.appendChild(resultDiv);
+
+            // Store configuration data
+            historyEntry.dataset.config = JSON.stringify({
+                dice: currentPool.map(d => ({count: d.count, sides: d.sides})),
+                modifier: parseInt(modifier.value) || 0,
+                target: target || '',
+                rollType: rollType
+            });
+
+            // Add click handler
+            historyEntry.style.cursor = 'pointer';
+            historyEntry.title = 'Click to restore this roll configuration';
+            historyEntry.addEventListener('click', () => restoreConfiguration(historyEntry));
+
+            return historyEntry;
+        }
+
+        function restoreConfiguration(historyEntry) {
+            const config = JSON.parse(historyEntry.dataset.config);
+            
+            // Clear current pool
+            currentPool = [];
+            updateDicePoolDisplay();
+            
+            // Restore dice
+            config.dice.forEach(die => {
+                addToDicePool(die.count, die.sides);
+            });
+            
+            // Restore modifier
+            modifier.value = config.modifier;
+            
+            // Restore target
+            targetNumber.value = config.target;
+            
+            // Restore roll type
+            rollType = config.rollType;
+            document.querySelectorAll('.adv-button').forEach(button => {
+                button.classList.toggle('selected', button.id === config.rollType);
+            });
+
+            // Visual feedback
+            historyEntry.style.transform = 'scale(1.02)';
+            setTimeout(() => {
+                historyEntry.style.transform = 'scale(1)';
+            }, 200);
+
+            // Update chart
+            updateChart();
+        }
+
+        function rollDice() {
+            if (currentPool.length === 0) {
+                result.textContent = 'Add some dice first!';
+                return;
+            }
+
+            let rolls = [];
+            let total = 0;
+            let rollDetails = [];
+            let d20Details = [];  // Separate array for d20 details
+
+            // Collect rolls
+            currentPool.forEach(dice => {
+                if (dice.sides === 20) {
+                    if (rollType !== 'normal') {
+                        const roll1 = rollSingleDie(dice.sides);
+                        const roll2 = rollSingleDie(dice.sides);
+                        const finalRoll = rollType === 'advantage' ? 
+                            Math.max(roll1, roll2) : Math.min(roll1, roll2);
+                        rolls.push(finalRoll);
+                        d20Details.push(`d20[${roll1},${roll2}]`);
+                        total += finalRoll;
+                    } else {
+                        const diceRolls = [];
+                        for (let i = 0; i < dice.count; i++) {
+                            const roll = rollSingleDie(dice.sides);
+                            diceRolls.push(roll);
+                            total += roll;
+                        }
+                        rolls = rolls.concat(diceRolls);
+                        d20Details.push(`${dice.count > 1 ? dice.count : ''}d20[${diceRolls.join(',')}]`);
+                    }
+                } else {
+                    const diceRolls = [];
+                    for (let i = 0; i < dice.count; i++) {
+                        const roll = rollSingleDie(dice.sides);
+                        diceRolls.push(roll);
+                        total += roll;
+                    }
+                    rolls = rolls.concat(diceRolls);
+                    rollDetails.push(`${dice.count}d${dice.sides}[${diceRolls.join(',')}]`);
+                }
+            });
+
+            // Combine details with d20s first
+            const allDetails = [...d20Details, ...rollDetails];
+
+            // Add modifier
+            const modValue = parseInt(modifier.value) || 0;
+            total += modValue;
+
+            // Format the roll description
+            const rollDescription = formatRollDescription(currentPool, modValue);
+            
+            // Check target and critical rules
+            const target = parseInt(targetNumber.value);
+            result.className = '';
+            
+            const criticalResult = checkCritical(rolls, total, target);
+            
+            if (criticalResult) {
+                result.classList.add(criticalResult);
+                if (criticalResult === 'critical-success') {
+                    result.classList.add('success');
+                } else if (criticalResult === 'critical-failure') {
+                    result.classList.add('failure');
+                }
+            } else if (target) {
+                result.classList.add(total >= target ? 'success' : 'failure');
+            }
+
+            // Create result text
+            let resultText = `${rollDescription} = ${total}`;
+            if (rollType !== 'normal') {
+                resultText += ` (${rollType})`;
+            }
+            if (target) {
+                resultText += ` vs ${target}`;
+            }
+            
+            // Update display with sorted details
+            result.innerHTML = `
+                <div class="roll-main">${resultText}</div>
+                <div class="roll-details">${allDetails.join(' + ')}</div>
+            `;
+
+            // Create and add history entry
+            const historyEntry = createHistoryEntry(
+                rollDescription, 
+                total, 
+                parseInt(targetNumber.value), 
+                criticalResult,
+                rollType
+            );
+            
+            history.insertBefore(historyEntry, history.firstChild);
+            
+            if (history.children.length > 50) {
+                history.removeChild(history.lastChild);
+            }
+
+            updateChart();
+        }
+
+        rollButton.addEventListener('click', rollDice);
+
+        const chartContainer = document.getElementById('chartContainer');
+        let oddsChart = null;
+
+        function calculateOdds() {
+            if (currentPool.length === 0) return null;
+
+            // Initialize probability map
+            let probabilities = new Map([[0, 1]]);
+
+            // Calculate probabilities for each dice group
+            currentPool.forEach(dice => {
+                const newProbs = new Map();
+                
+                if (dice.sides === 20 && rollType !== 'normal') {
+                    // Handle advantage/disadvantage for d20
+                    probabilities.forEach((oldProb, oldSum) => {
+                        // Calculate probabilities for two d20 rolls
+                        for (let roll1 = 1; roll1 <= 20; roll1++) {
+                            for (let roll2 = 1; roll2 <= 20; roll2++) {
+                                const finalRoll = rollType === 'advantage' ? 
+                                    Math.max(roll1, roll2) : Math.min(roll1, roll2);
+                                const newSum = oldSum + finalRoll;
+                                const newProb = (newProbs.get(newSum) || 0) + 
+                                    (oldProb * (1/400)); // 1/20 * 1/20 for two dice
+                                newProbs.set(newSum, newProb);
+                            }
+                        }
+                    });
+                } else {
+                    // Normal dice rolls
+                    for (let i = 0; i < dice.count; i++) {
+                        const currentProbs = new Map(i === 0 ? probabilities : newProbs);
+                        newProbs.clear();
+                        
+                        currentProbs.forEach((oldProb, oldSum) => {
+                            for (let roll = 1; roll <= dice.sides; roll++) {
+                                const newSum = oldSum + roll;
+                                const newProb = (newProbs.get(newSum) || 0) + oldProb / dice.sides;
+                                newProbs.set(newSum, newProb);
+                            }
+                        });
+                    }
+                }
+                
+                probabilities = newProbs;
+            });
+
+            // Apply modifier
+            const modValue = parseInt(modifier.value) || 0;
+            if (modValue !== 0) {
+                const newProbs = new Map();
+                probabilities.forEach((prob, sum) => {
+                    newProbs.set(sum + modValue, prob);
+                });
+                probabilities = newProbs;
+            }
+
+            return probabilities;
+        }
+
+        function calculateSuccessProbability(probabilities, target) {
+            if (!target) return null;
+
+            let successProb = 0;
+            let criticalSuccessProb = 0;
+            let criticalFailureProb = 0;
+            
+            // Check if there's a d20 in the pool
+            const hasD20 = currentPool.some(dice => dice.sides === 20);
+            
+            // Calculate base success probability (excluding natural 1 and 20 for d20s)
+            probabilities.forEach((prob, result) => {
+                if (result >= target) {
+                    successProb += prob;
+                }
+            });
+
+            // Handle critical success/failure for d20s
+            if (hasD20) {
+                const d20Count = currentPool.filter(dice => dice.sides === 20)
+                                         .reduce((sum, dice) => sum + dice.count, 0);
+                
+                if (rollType !== 'normal') {
+                    // Advantage/Disadvantage calculations
+                    if (rollType === 'advantage') {
+                        criticalSuccessProb = 1 - Math.pow(19/20, 2); // Chance of at least one 20
+                        criticalFailureProb = 1/400; // Need both to be 1
+                    } else { // disadvantage
+                        criticalSuccessProb = 1/400; // Need both to be 20
+                        criticalFailureProb = 1 - Math.pow(19/20, 2); // Chance of at least one 1
+                    }
+                } else {
+                    // Normal roll
+                    criticalSuccessProb = d20Count * (1/20); // Probability of rolling a 20
+                    criticalFailureProb = d20Count * (1/20); // Probability of rolling a 1
+                }
+
+                if (critSuccess.checked && target > 20) {
+                    // Add cases where natural 20 succeeds despite being below target
+                    successProb = successProb + (criticalSuccessProb * (1 - successProb));
+                }
+                
+                if (critFailure.checked && target <= 1) {
+                    // Remove cases where natural 1 fails despite being above target
+                    successProb = successProb - criticalFailureProb;
+                }
+            }
+
+            return {
+                total: successProb,
+                criticalSuccess: criticalSuccessProb,
+                criticalFailure: criticalFailureProb
+            };
+        }
+
+        function updateProbabilitySummary(probabilities, target) {
+            const summaryDiv = document.getElementById('probabilitySummary');
+            
+            if (!target || !probabilities) {
+                summaryDiv.style.display = 'none';
+                return;
+            }
+
+            const probs = calculateSuccessProbability(probabilities, target);
+            
+            let summaryHTML = `<div>Chance of Success: <strong>${(probs.total * 100).toFixed(1)}%</strong></div>`;
+            
+            // Add details if there are critical rules in play
+            if (probs.criticalSuccess > 0 || probs.criticalFailure > 0) {
+                summaryHTML += '<div class="probability-detail">';
+                if (probs.criticalSuccess > 0) {
+                    summaryHTML += `Critical Success: ${(probs.criticalSuccess * 100).toFixed(1)}%<br>`;
+                }
+                if (probs.criticalFailure > 0) {
+                    summaryHTML += `Critical Failure: ${(probs.criticalFailure * 100).toFixed(1)}%`;
+                }
+                summaryHTML += '</div>';
+            }
+
+            summaryDiv.innerHTML = summaryHTML;
+            summaryDiv.style.display = 'block';
+        }
+
+        function updateChart() {
+            const probabilities = calculateOdds();
+            if (!probabilities) {
+                chartContainer.style.display = 'none';
+                return;
+            }
+
+            chartContainer.style.display = 'block';
+            
+            const target = parseInt(targetNumber.value);
+            const sortedResults = Array.from(probabilities.entries()).sort((a, b) => a[0] - b[0]);
+            const labels = sortedResults.map(([result]) => result.toString());
+            const data = sortedResults.map(([, prob]) => (prob * 100).toFixed(2));
+
+            // Define colors
+            const successColor = 'rgba(75, 181, 67, 0.6)';     // Soft green
+            const failureColor = 'rgba(214, 69, 65, 0.6)';     // Soft red
+            const successBorder = 'rgba(75, 181, 67, 1)';      // Solid green
+            const failureBorder = 'rgba(214, 69, 65, 1)';      // Solid red
+
+            // Create color arrays based on target number
+            const backgroundColor = data.map((_, index) => {
+                const value = parseInt(labels[index]);
+                if (!target) return 'rgba(33, 150, 243, 0.6)'; // Default blue if no target
+                return value >= target ? successColor : failureColor;
+            });
+
+            const borderColor = data.map((_, index) => {
+                const value = parseInt(labels[index]);
+                if (!target) return 'rgba(33, 150, 243, 1)'; // Default blue if no target
+                return value >= target ? successBorder : failureBorder;
+            });
+
+            // Destroy existing chart if it exists
+            if (oddsChart) {
+                oddsChart.destroy();
+            }
+
+            const ctx = document.getElementById('oddsChart').getContext('2d');
+            oddsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Probability (%)',
+                        data: data,
+                        backgroundColor: backgroundColor,
+                        borderColor: borderColor,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 500
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'rgba(255, 255, 255, 0.8)'
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: `Roll Probabilities${rollType !== 'normal' ? ` (${rollType})` : ''}${target ? ` - Target: ${target}` : ''}`,
+                            color: 'rgba(255, 255, 255, 0.8)',
+                            font: {
+                                size: 16
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.8)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.8)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Update probability summary
+            updateProbabilitySummary(probabilities, target);
+        }
+
+        // Add event listeners for dice count and modifier changes
+        diceCount.addEventListener('change', () => {
+            if (currentPool.length > 0) {
+                updateChart();
+            }
+        });
+
+        modifier.addEventListener('change', () => {
+            if (currentPool.length > 0) {
+                updateChart();
+            }
+        });
+
+        // Add target number change listener
+        targetNumber.addEventListener('input', () => {
+            // Ensure the value is within bounds
+            let value = parseInt(targetNumber.value);
+            if (value < 1) targetNumber.value = 1;
+            if (value > 99) targetNumber.value = 99;
+            
+            if (currentPool.length > 0) {
+                updateChart();
+            }
+        });
+
+        // Add listeners for critical success/failure toggles
+        critSuccess.addEventListener('change', () => {
+            if (currentPool.length > 0) {
+                updateChart();
+            }
+        });
+
+        critFailure.addEventListener('change', () => {
+            if (currentPool.length > 0) {
+                updateChart();
+            }
+        });
+
+        // Function to encode current roll configuration to URL
+        function encodeRollToURL() {
+            const params = new URLSearchParams();
+            
+            // Check if there's a dice pool
+            if (currentPool.length === 0) {
+                alert('Add some dice to your pool first!');
+                return null;
+            }
+            
+            // Encode dice pool
+            const poolString = currentPool.map(dice => `${dice.count}d${dice.sides}`).join(',');
+            params.set('pool', poolString);
+            
+            // Encode modifier
+            const mod = parseInt(modifier.value) || 0;
+            if (mod !== 0) {
+                params.set('mod', mod);
+            }
+            
+            // Encode target
+            const target = parseInt(targetNumber.value);
+            if (target) {
+                params.set('target', target);
+            }
+            
+            // Encode roll type
+            if (rollType !== 'normal') {
+                params.set('type', rollType);
+            }
+            
+            // Encode critical rules
+            if (!critSuccess.checked) {
+                params.set('critSuccess', 'false');
+            }
+            if (!critFailure.checked) {
+                params.set('critFailure', 'false');
+            }
+            
+            // Update URL without reloading the page
+            const newUrl = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
+            window.history.pushState({ path: newUrl }, '', newUrl);
+            
+            return window.location.href;
+        }
+
+        // Function to decode URL parameters and set up roll
+        function decodeURLToRoll() {
+            const params = new URLSearchParams(window.location.search);
+            
+            // Clear existing pool
+            currentPool = [];
+            updateDicePoolDisplay();
+            
+            // Decode dice pool
+            const poolString = params.get('pool');
+            if (poolString) {
+                poolString.split(',').forEach(diceString => {
+                    const [count, sides] = diceString.split('d').map(Number);
+                    if (count && sides) {
+                        addToDicePool(count, sides);
+                    }
+                });
+            }
+            
+            // Decode modifier
+            const mod = params.get('mod');
+            if (mod !== null) {
+                modifier.value = mod;
+            }
+            
+            // Decode target
+            const target = params.get('target');
+            if (target !== null) {
+                targetNumber.value = target;
+            }
+            
+            // Decode roll type
+            const type = params.get('type');
+            if (type) {
+                rollType = type;
+                advantageButtons.forEach(button => {
+                    button.classList.toggle('selected', button.id === type);
+                });
+            }
+            
+            // Decode critical rules
+            const critSuccessParam = params.get('critSuccess');
+            if (critSuccessParam !== null) {
+                critSuccess.checked = critSuccessParam === 'true';
+            }
+            const critFailureParam = params.get('critFailure');
+            if (critFailureParam !== null) {
+                critFailure.checked = critFailureParam === 'true';
+            }
+            
+            // Update display if there's a dice pool
+            if (currentPool.length > 0) {
+                updateChart();
+            }
+        }
+
+        // Add share button to the UI
+        const shareButton = document.createElement('button');
+        shareButton.id = 'shareButton';
+        shareButton.innerHTML = '🔗 Share Roll';
+        shareButton.className = 'share-button';
+        document.querySelector('.controls-section').appendChild(shareButton);
+
+        // Add share button styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .share-button {
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 12px;
+                cursor: pointer;
+                font-size: 16px;
+                margin: 10px 0;
+                transition: all 0.3s ease;
+                width: 100%;
+            }
+
+            .share-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            }
+
+            .share-button:active {
+                transform: translateY(1px);
+            }
+
+            .toast {
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-size: 14px;
+                z-index: 1000;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .toast.show {
+                opacity: 1;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Add share button functionality
+        shareButton.addEventListener('click', async () => {
+            const url = encodeRollToURL();
+            
+            // If no URL was generated (no dice), return early
+            if (!url) return;
+            
+            // Try to use Share API if available
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Dice Roll Configuration',
+                        url: url
+                    });
+                    return;
+                } catch (err) {
+                    // Fall back to clipboard if share fails
+                }
+            }
+            
+            // Copy to clipboard
+            try {
+                await navigator.clipboard.writeText(url);
+                
+                // Show toast notification
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.textContent = 'Link copied to clipboard!';
+                document.body.appendChild(toast);
+                
+                // Show the toast
+                setTimeout(() => toast.classList.add('show'), 10);
+                
+                // Remove the toast after 3 seconds
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            } catch (err) {
+                alert('Failed to copy link. Please copy the URL manually.');
+            }
+        });
+
+        // Load configuration from URL when page loads
+        window.addEventListener('load', decodeURLToRoll);
+
+        // Call this after DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeAdvantageButtons();
+            // ... other initializations ...
+        });
+
+        // Add error toast style
+        const toastStyles = document.createElement('style');
+        toastStyles.textContent = `
+            .toast {
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-size: 14px;
+                z-index: 1000;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .toast.error {
+                background: rgba(214, 69, 65, 0.9);
+            }
+
+            .toast.show {
+                opacity: 1;
+            }
+        `;
+        document.head.appendChild(toastStyles);
+    </script>
+</body>
+</html>
