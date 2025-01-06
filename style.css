@@ -2,7 +2,7 @@ body{
 	max-width:40em;
 	margin:0 auto;
 	padding:5px;
-	font-family:Georgia,serif;
+	font-family:Verdana, Geneva, Tahoma, sans-serif,serif;
 	font-size:20px;
 	line-height:30px;
 	background-color:#fff;
@@ -14,7 +14,7 @@ h1,h2,h3,dt,small,.small,footer,label,cite,div.blogparent,input[type="submit"]{
 	font-style:normal
 }
 span.url {
-	font-family:Georgia,serif;
+	font-family:Verdana, Geneva, Tahoma, sans-serif,serif;
 }
 small,.small,footer{
 	font-size:0.8em;
