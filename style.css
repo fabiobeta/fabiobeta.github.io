@@ -51,6 +51,7 @@ h2{
 p{
   margin: 0.35em 0;
   line-height: 1.55;
+  border: 1px solid;
 }
 
 /* Add extra space only between consecutive paragraphs */
