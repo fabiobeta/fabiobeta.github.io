@@ -24,8 +24,8 @@ body > *{
   max-width: 68ch;
   margin-inline: auto;
   padding-inline: 20px;
-  padding-top: 16px;
-  padding-bottom: 16px;
+  padding-top: 0em;
+  padding-bottom: 0.1em;
 }
 
 /* Headings */
