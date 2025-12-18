@@ -15,8 +15,10 @@ body{
   background: var(--bg);
   color: var(--text);
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-  font-size: 17px;
-  line-height: 1.55;
+
+  /* A) Typography (mobile-first) */
+  font-size: 18px;       /* was 17px */
+  line-height: 1.68;     /* was 1.55 */
 }
 
 /* Works even if you have no <main> wrapper */
@@ -30,51 +32,52 @@ body > *{
 
 /* Headings */
 h1, h2{
-  line-height: 1.2;
+  line-height: 1.18;         /* tighter than body for confidence */
   letter-spacing: -0.02em;
 }
 
 h1{
-  font-size: clamp(2rem, 3vw, 2.6rem);
-  margin: 0.2em 0 0.6em;
+  font-size: clamp(2.1rem, 4.2vw, 2.8rem);  /* slightly larger */
+  font-weight: 750;                          /* more deliberate */
+  margin: 0.25em 0 0.6em;
 }
 
 h2{
-  font-size: 1.05rem;
-  font-weight: 650;
-  margin: 1.0em 0 0.5em;
-  padding-top: 0.35em;
+  font-size: 1.2rem;     /* was 1.05rem */
+  font-weight: 750;     /* was 650 */
+  margin: 1.25em 0 0.55em;
+  padding-top: 0.55em;  /* a touch more separation */
   border-top: 1px solid var(--border);
 }
 
 /* Paragraph rhythm */
 p{
-  margin: 0.35em 0;
-  line-height: 1.55;
+  margin: 0.5em 0;      /* slightly more air */
+  line-height: inherit; /* follow body line-height */
 }
 
 /* Add extra space only between consecutive paragraphs */
 p + p{
-  margin-top: 0.0em;
+  margin-top: 0.2em;    /* was 0.0em; helps readability on mobile */
 }
 
 /* Slight emphasis for the first paragraph after a section heading */
 h2 + p{
-  font-size: 1.03em;
+  font-size: 1.04em;
 }
 
 /* Horizontal rules (if you have any) */
 hr{
   border: 0;
   border-top: 1px solid var(--border);
-  margin: 1.6em 0;
+  margin: 1.8em 0;
 }
 
 /* Links */
 a{
   color: var(--link);
   text-decoration: underline;
-  text-decoration-thickness: 0.06em;
+  text-decoration-thickness: 0.07em;  /* slightly clearer */
   text-underline-offset: 0.18em;
 }
 
@@ -91,4 +94,9 @@ a:focus-visible{
 /* Selection */
 ::selection{
   background: rgba(29, 78, 216, 0.18);
+}
+
+/* Small screens: keep it comfortable without feeling oversized */
+@media (max-width: 380px){
+  body{ font-size: 17px; }
 }
