@@ -55,7 +55,7 @@ p{
 
 /* Add extra space only between consecutive paragraphs */
 p + p{
-  margin-top: 0.65em;
+  margin-top: 0.0em;
 }
 
 /* Slight emphasis for the first paragraph after a section heading */
