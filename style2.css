@@ -1,12 +1,12 @@
-/* style.css — editorial, newspaper-warm, readable
+/* style.css — editorial, warm, mobile-oversized test (24px body)
    No HTML changes required
 */
 
 :root{
-  /* Warm paper palette (clearly warm, not cool) */
-  --bg: #fff4dc;          /* warm newsprint */
-  --surface: #fffaf0;     /* inner paper */
-  --text: #0f172a;        /* deep ink */
+  /* Warm paper palette */
+  --bg: #fff4dc;
+  --surface: #fffaf0;
+  --text: #0f172a;
   --muted: #475569;
   --faint: #64748b;
 
@@ -14,7 +14,7 @@
   --linkHover: #0b3ea8;
 
   --border: #e6d6b8;
-  --hairline: rgba(15,23,42,.10);
+  --hairline: rgba(15,23,42,.12);
 
   /* Typography */
   --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
@@ -22,7 +22,7 @@
   --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas;
 
   /* Layout */
-  --content: 72ch;
+  --content: 70ch;
   --padX: 20px;
   --radius: 14px;
 }
@@ -37,13 +37,13 @@ body{
   background: var(--bg);
   color: var(--text);
   font-family: var(--sans);
-  font-size: 18px;          /* IMPORTANT: clearly larger */
-  line-height: 1.68;
+  font-size: 18px; /* desktop baseline */
+  line-height: 1.65;
   letter-spacing: -0.01em;
-  padding: 16px 0 56px;
+  padding: 18px 0 56px;
 }
 
-/* Centered readable column */
+/* Centered reading column */
 body > *{
   max-width: var(--content);
   margin-left: auto;
@@ -52,41 +52,44 @@ body > *{
   padding-right: var(--padX);
 }
 
-/* Desktop “sheet of paper” */
+/* Desktop paper sheet */
 main{
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 24px 0;
+  padding: 26px 0;
 }
 
 /* Headings */
 h1, h2, h3{
   color: var(--text);
-  line-height: 1.18;
+  line-height: 1.15;
   letter-spacing: -0.02em;
+  margin: 1.1em 0 .45em;
 }
 
 h1{
   font-family: var(--serif);
   font-weight: 700;
-  font-size: clamp(36px, 3.5vw, 48px);
-  margin: .3em 0 .4em;
+  font-size: clamp(38px, 3.8vw, 50px);
+  margin-top: .3em;
+  margin-bottom: .4em;
 }
 
 h2{
   font-family: var(--serif);
   font-weight: 700;
-  font-size: 24px;
-  margin: 1.4em 0 .35em;
-  padding-top: .35em;
+  font-size: 26px;
+  margin-top: 1.6em;
+  padding-top: .4em;
   border-top: 1px solid var(--border);
 }
 
 h3{
+  font-family: var(--sans);
   font-weight: 700;
-  font-size: 19px;
-  margin-top: 1.2em;
+  font-size: 20px;
+  margin-top: 1.3em;
 }
 
 /* Lead paragraph */
@@ -97,9 +100,8 @@ h1 + p{
 }
 
 /* Paragraph rhythm */
-p{
-  margin: .55em 0;
-}
+p{ margin: .55em 0; }
+small{ color: var(--faint); }
 
 /* Links */
 a{
@@ -107,44 +109,73 @@ a{
   text-decoration-thickness: 1px;
   text-underline-offset: 2px;
 }
-a:hover{
-  color: var(--linkHover);
-}
+a:hover{ color: var(--linkHover); }
 
 /* Lists */
-ul, ol{
-  margin: .7em 0 .7em 1.2em;
-}
-li{
-  margin: .3em 0;
+ul, ol{ margin: .7em 0 .7em 1.3em; }
+li{ margin: .3em 0; }
+
+/* Code */
+code{
+  font-family: var(--mono);
+  background: rgba(0,0,0,.04);
+  border: 1px solid rgba(0,0,0,.08);
+  padding: .15em .4em;
+  border-radius: 8px;
+  font-size: .9em;
 }
 
-/* Mobile: full-bleed, bigger, calmer */
+/* =========================
+   MOBILE: 24px BODY TEST (balanced headings)
+   ========================= */
 @media (max-width: 640px){
+  :root{ --padX: 16px; }
+
   body{
-    font-size: 18px;     /* stays large on mobile */
-    line-height: 1.65;
+    font-size: 24px;     /* intentional overshoot */
+    line-height: 1.55;
     padding-top: 10px;
+    padding-bottom: 40px;
   }
 
+  /* Full-bleed on mobile */
   main{
     background: transparent;
     border: 0;
+    border-radius: 0;
     padding: 0;
   }
 
+  /* Rebalanced heading scale vs 24px body */
   h1{
-    font-size: 34px;
+    font-size: 52px;
+    line-height: 1.06;
+    margin-top: .18em;
+    margin-bottom: .28em;
+    letter-spacing: -0.03em;
+  }
+
+  /* Lead paragraph: same size as body, but muted */
+  h1 + p{
+    font-size: 24px;
+    line-height: 1.45;
+    color: var(--muted);
+    margin-top: .55em;
   }
 
   h2{
     font-family: var(--sans);
-    font-size: 19px;
-    font-weight: 800;
+    font-size: 30px;     /* must be > 24 */
+    font-weight: 850;
+    line-height: 1.12;
     border-top: 0;
-    margin-top: 1.1em;
+    padding-top: 0;
+    margin-top: 1.05em;
+    margin-bottom: .35em;
+    letter-spacing: -0.02em;
   }
 
+  /* Subtle rule after the header (not before) */
   h2::after{
     content: "";
     display: block;
@@ -152,7 +183,24 @@ li{
     border-bottom: 1px solid var(--hairline);
   }
 
-  h1 + p{
-    font-size: 18px;
+  h3{
+    font-size: 26px;     /* slightly > body */
+    line-height: 1.18;
+    margin-top: 1.05em;
+    margin-bottom: .35em;
   }
+
+  p{
+    margin: .62em 0;
+  }
+
+  /* Lists feel too loose at 24px unless tightened slightly */
+  li{
+    margin: .22em 0;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce){
+  *{ transition: none !important; animation: none !important; }
 }
