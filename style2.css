@@ -1,0 +1,282 @@
+/* style.css — minimal, readable, light-only */
+
+:root{
+  /* Color system (soft editorial, high-contrast but not harsh) */
+  --bg: #fbfbfc;
+  --surface: #ffffff;
+  --text: #111827;
+  --muted: #4b5563;
+  --faint: #6b7280;
+  --link: #0f56d6;
+  --linkHover: #0b3ea8;
+  --border: #e6e7eb;
+  --shadow: 0 1px 0 rgba(17,24,39,.04), 0 10px 30px rgba(17,24,39,.06);
+
+  /* Typography */
+  --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  --serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+
+  /* Layout scale */
+  --content: 74ch;
+  --padX: 18px;
+  --padY: 24px;
+  --radius: 14px;
+
+  /* Rhythm */
+  --lh: 1.65;
+}
+
+html{
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+
+body{
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: var(--lh);
+  letter-spacing: -0.01em;
+}
+
+/* Works even if you have no <main> wrapper */
+body > *{
+  max-width: var(--content);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--padX);
+  padding-right: var(--padX);
+}
+
+/* Give the whole page a “card” feel without requiring wrapper changes */
+body{
+  padding-top: 22px;
+  padding-bottom: 54px;
+}
+
+/* If your HTML uses <main>, make it read like an article */
+main{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding-top: 22px;
+  padding-bottom: 22px;
+}
+
+/* If you *don’t* have <main>, still create gentle separation */
+body > :not(main){
+  /* keep it neutral; spacing handled by element margins */
+}
+
+/* Headings: confident, editorial (serif) */
+h1, h2, h3{
+  color: var(--text);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 1.1em 0 .45em;
+}
+
+h1{
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(34px, 3.4vw, 48px);
+  margin-top: .35em;
+}
+
+h2{
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(22px, 2.1vw, 28px);
+  margin-top: 1.6em;
+  padding-top: .35em;
+  border-top: 1px solid var(--border);
+}
+
+h3{
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 18px;
+  margin-top: 1.25em;
+}
+
+/* Text blocks: tighter paragraph spacing (your request) */
+p{
+  margin: .6em 0;
+  color: var(--text);
+}
+
+p + p{
+  margin-top: .55em;
+}
+
+/* Subtle “dek” feel if you have a lead line under the title */
+h1 + p{
+  font-size: 18px;
+  color: var(--muted);
+  margin-top: .55em;
+}
+
+/* Links: crisp, modern */
+a{
+  color: var(--link);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+a:hover{
+  color: var(--linkHover);
+  text-decoration-thickness: 2px;
+}
+
+/* Lists */
+ul, ol{
+  margin: .7em 0 .7em 1.2em;
+  padding: 0;
+}
+
+li{
+  margin: .3em 0;
+}
+
+/* Blockquotes: editorial callout */
+blockquote{
+  margin: 1.1em 0;
+  padding: .9em 1em;
+  background: #f6f7fb;
+  border: 1px solid var(--border);
+  border-left: 4px solid #c7d2fe;
+  border-radius: 10px;
+  color: var(--muted);
+}
+
+blockquote p{
+  margin: .35em 0;
+  color: inherit;
+}
+
+/* Code */
+code, kbd, samp{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: .92em;
+}
+
+code{
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  padding: .12em .35em;
+  border-radius: 8px;
+}
+
+pre{
+  background: #0b1220;
+  color: #e5e7eb;
+  border-radius: 14px;
+  padding: 14px 16px;
+  overflow: auto;
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 10px 30px rgba(0,0,0,.15);
+  margin: 1em 0;
+}
+
+pre code{
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: inherit;
+}
+
+/* Horizontal rule */
+hr{
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 1.6em 0;
+}
+
+/* Images */
+img{
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  display: block;
+  margin: 1em 0;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+/* Tables (light, readable) */
+table{
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+  font-size: 15px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+th, td{
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+th{
+  background: #f6f7fb;
+  color: #111827;
+  font-weight: 700;
+}
+
+tr:last-child td{
+  border-bottom: 0;
+}
+
+/* Form elements (minimal but not ugly) */
+input, textarea, select, button{
+  font: inherit;
+}
+
+input, textarea, select{
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  outline: none;
+}
+
+input:focus, textarea:focus, select:focus{
+  border-color: rgba(15,86,214,.45);
+  box-shadow: 0 0 0 4px rgba(15,86,214,.12);
+}
+
+/* Mobile: keep it comfortable */
+@media (max-width: 640px){
+  :root{
+    --padX: 16px;
+  }
+  body{
+    font-size: 16.5px;
+  }
+  main{
+    border-radius: 12px;
+    padding-top: 18px;
+    padding-bottom: 18px;
+  }
+}
+
+/* Accessibility: reduce motion */
+@media (prefers-reduced-motion: reduce){
+  *{
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}
