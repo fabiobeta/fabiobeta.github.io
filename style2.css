@@ -1,214 +1,127 @@
-/* style.css — editorial, warm, optimized for PERCEIVED size on mobile
-   Key idea: make mobile column narrower + slightly larger type + tighter leading
-   so it feels like MAD/FT reading mode without changing HTML.
-*/
+/* style.css — minimal, readable, mobile-first (full-width on phone) */
 
 :root{
-  /* Warm paper palette */
-  --bg: #fff4dc;
-  --surface: #fffaf0;
-  --text: #0f172a;
-  --muted: #475569;
-  --faint: #64748b;
+  --bg: #fbf3df;          /* warm paper */
+  --text: #1f2937;        /* soft black */
+  --muted: #6b7280;
+  --link: #1d4ed8;
+  --border: #e5e7eb;
 
-  --link: #0f56d6;
-  --linkHover: #0b3ea8;
-
-  --border: #e6d6b8;
-  --hairline: rgba(15,23,42,.12);
-
-  /* Typography */
-  --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-  --serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas;
-
-  /* Layout */
-  --content: 70ch;
-  --padX: 20px;
-  --radius: 14px;
+  /* layout + rhythm */
+  --pad: 1.25rem;         /* mobile side padding */
+  --max: 70ch;            /* desktop readable line length */
 }
 
 html{
   -webkit-text-size-adjust: 100%;
-  text-rendering: optimizeLegibility;
+  text-size-adjust: 100%;
+}
+
+*,
+*::before,
+*::after{
+  box-sizing: border-box;
 }
 
 body{
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: var(--sans);
-  font-size: 18px;        /* desktop baseline */
-  line-height: 1.65;
-  letter-spacing: -0.01em;
-  padding: 18px 0 56px;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  font-size: 24px;        /* supersized mobile test */
+  line-height: 1.5;
 }
 
-/* Centered reading column (desktop/tablet) */
+/* Make content full width on mobile, with comfortable padding.
+   This is the fix for "paragraph stops early". */
 body > *{
-  max-width: var(--content);
-  margin-left: 0px;
-  margin-right: 0px;
-  padding-left: var(--padX);
-  padding-right: var(--padX);
+  width: 100%;
+  max-width: none;        /* key: remove ch constraint on mobile */
+  margin: 0;
+  padding-left: var(--pad);
+  padding-right: var(--pad);
 }
 
-/* Desktop paper sheet */
-main{
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 26px 0;
+/* On larger screens, restore a readable column and center it */
+@media (min-width: 720px){
+  body{
+    font-size: 18px;
+    line-height: 1.6;
+  }
+
+  body > *{
+    max-width: var(--max);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
 }
 
-/* Headings */
+/* Headings: proportionally larger than body */
 h1, h2, h3{
-  color: var(--text);
   line-height: 1.15;
-  letter-spacing: -0.02em;
-  margin: 1.1em 0 .45em;
+  margin: 1.1em 0 0.5em;
+  letter-spacing: -0.01em;
 }
 
-h1{
-  font-family: var(--serif);
-  font-weight: 700;
-  font-size: clamp(38px, 3.8vw, 50px);
-  margin-top: .3em;
-  margin-bottom: .4em;
-}
+h1{ font-size: 1.55em; }  /* ~37px on mobile */
+h2{ font-size: 1.25em; }  /* ~30px on mobile */
+h3{ font-size: 1.10em; }
 
-h2{
-  font-family: var(--serif);
-  font-weight: 700;
-  font-size: 26px;
-  margin-top: 1.6em;
-  padding-top: .4em;
-  border-top: 1px solid var(--border);
+/* Paragraph spacing: tighter than default, still breathable */
+p{
+  margin: 0 0 0.85em;
 }
-
-h3{
-  font-family: var(--sans);
-  font-weight: 700;
-  font-size: 20px;
-  margin-top: 1.3em;
-}
-
-h1 + p{
-  font-size: 19px;
-  color: var(--muted);
-  margin-top: .5em;
-}
-
-/* Body rhythm */
-p{ margin: .55em 0; }
-small{ color: var(--faint); }
-
-/* Links */
-a{
-  color: var(--link);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 2px;
-}
-a:hover{ color: var(--linkHover); }
 
 /* Lists */
-ul, ol{ margin: .7em 0 .7em 1.3em; }
-li{ margin: .3em 0; }
-
-/* Code */
-code{
-  font-family: var(--mono);
-  background: rgba(0,0,0,.04);
-  border: 1px solid rgba(0,0,0,.08);
-  padding: .15em .4em;
-  border-radius: 8px;
-  font-size: .9em;
+ul, ol{
+  margin: 0 0 0.95em;
+  padding-left: 1.2em;
 }
 
-/* =========================
-   MOBILE: PERCEIVED-SIZE OPTIMIZATION
-   ========================= */
-@media (max-width: 800px){
-  :root{
-    --padX: 16px;
-  }
+li{ margin: 0.25em 0; }
 
-  /* 1) Slightly larger base, 2) tighter leading, 3) narrower measure
-     -> feels much bigger than just increasing px */
-  body{
-    font-size: 24px;
-    line-height: 1.52;
-    padding-top: 10px;
-    padding-bottom: 40px;
-  }
-
-  /* Full-bleed: remove card metaphors */
-  main{
-    background: transparent;
-    border: 0;
-    border-radius: 0;
-    padding: 0;
-  }
-
-  /* Narrower mobile column to increase perceived size */
-  body > *{
-    max-width: 36ch;   /* critical */
-  }
-
-  /* Mobile type scale (balanced vs 21px body) */
-  h1{
-    font-size: 44px;
-    line-height: 1.05;
-    margin-top: .22em;
-    margin-bottom: .28em;
-    letter-spacing: -0.03em;
-  }
-
-  h1 + p{
-    font-size: 21px;   /* same as body; “dek” comes from color/spacing */
-    line-height: 1.45;
-    color: var(--muted);
-    margin-top: .55em;
-  }
-
-  h2{
-    font-family: var(--sans);
-    font-size: 26px;
-    font-weight: 850;
-    line-height: 1.12;
-    border-top: 0;
-    padding-top: 0;
-    margin-top: 1.05em;
-    margin-bottom: .35em;
-    letter-spacing: -0.02em;
-  }
-
-  h2::after{
-    content: "";
-    display: block;
-    margin-top: .55em;
-    border-bottom: 1px solid var(--hairline);
-  }
-
-  h3{
-    font-size: 23px;
-    line-height: 1.16;
-    margin-top: 1.0em;
-    margin-bottom: .35em;
-  }
-
-  /* Slightly tighter paragraph spacing reads more “editorial” */
-  p{
-    margin: .58em 0;
-  }
-
-  /* Lists at larger type need tighter item gaps */
-  li{
-    margin: .22em 0;
-  }
+/* Links: clear but not neon */
+a{
+  color: var(--link);
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+  text-decoration-thickness: 0.08em;
 }
 
-/* Accessibility */
-@media (prefers-reduced-motion: reduce){
-  *{ transition: none !important; animation: none !important; }
+a:visited{
+  color: #5b21b6;
+}
+
+a:hover, a:focus{
+  text-decoration-thickness: 0.12em;
+}
+
+/* Optional: subtle section separation if you use <hr> */
+hr{
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 1.25em 0;
+}
+
+/* Code blocks if any appear */
+code, pre{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.92em;
+}
+
+pre{
+  overflow-x: auto;
+  padding: 0.9em 1em;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.55);
+}
+
+/* Images behave */
+img{
+  max-width: 100%;
+  height: auto;
+  display: block;
 }
