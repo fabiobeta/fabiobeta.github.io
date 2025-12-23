@@ -128,7 +128,7 @@ code{
 /* =========================
    MOBILE: PERCEIVED-SIZE OPTIMIZATION
    ========================= */
-@media (max-width: 640px){
+@media (max-width: 800px){
   :root{
     --padX: 16px;
   }
@@ -136,7 +136,7 @@ code{
   /* 1) Slightly larger base, 2) tighter leading, 3) narrower measure
      -> feels much bigger than just increasing px */
   body{
-    font-size: 21px;
+    font-size: 24px;
     line-height: 1.52;
     padding-top: 10px;
     padding-bottom: 40px;
