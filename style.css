@@ -1,102 +1,118 @@
-/* style.css — minimal, readable, light-only */
+/* style.css — minimal, readable, mobile-first */
 
 :root{
-  --bg: #ffffff;
-  --text: #1f2937;   /* softer than pure black */
+  --bg: #fbf3df;
+  --text: #1f2937;
   --muted: #6b7280;
   --link: #1d4ed8;
   --border: #e5e7eb;
+
+  --pad: 1.25rem;
+  --max: 70ch;
 }
 
-html{ -webkit-text-size-adjust: 100%; }
+html{
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+*,
+*::before,
+*::after{
+  box-sizing: border-box;
+}
 
 body{
   margin: 0;
   background: var(--bg);
   color: var(--text);
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-
-  /* A) Typography (mobile-first) */
-  font-size: 18px;       /* was 17px */
-  line-height: 1.68;     /* was 1.55 */
+  font-size: 24px;
+  line-height: 1.5;
+  text-rendering: optimizeLegibility;
 }
 
-/* Works even if you have no <main> wrapper */
+/* Mobile: full width + padding (prevents early right edge cutoff) */
 body > *{
-  max-width: 68ch;
-  margin-inline: auto;
-  padding-inline: 20px;
-  padding-top: 0em;
-  padding-bottom: 0.1em;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding-left: var(--pad);
+  padding-right: var(--pad);
 }
 
-/* Headings */
-h1, h2{
-  line-height: 1.18;         /* tighter than body for confidence */
-  letter-spacing: -0.02em;
+@media (min-width: 720px){
+  body{
+    font-size: 18px;
+    line-height: 1.65;
+  }
+
+  body > *{
+    max-width: var(--max);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
 }
 
-h1{
-  font-size: clamp(2.1rem, 4.2vw, 2.8rem);  /* slightly larger */
-  font-weight: 750;                          /* more deliberate */
-  margin: 0.25em 0 0.6em;
+h1, h2, h3{
+  line-height: 1.15;
+  margin: 1.1em 0 0.5em;
+  letter-spacing: -0.01em;
 }
 
-h2{
-  font-size: 1.2rem;     /* was 1.05rem */
-  font-weight: 750;     /* was 650 */
-  margin: 1.25em 0 0.55em;
-  padding-top: 0.55em;  /* a touch more separation */
-  border-top: 1px solid var(--border);
-}
+h1{ font-size: 1.6em; }
+h2{ font-size: 1.3em; }
+h3{ font-size: 1.12em; }
 
-/* Paragraph rhythm */
 p{
-  margin: 0.5em 0;      /* slightly more air */
-  line-height: inherit; /* follow body line-height */
+  margin: 0 0 0.9em;
+  max-width: 100%;
 }
 
-/* Add extra space only between consecutive paragraphs */
-p + p{
-  margin-top: 0.2em;    /* was 0.0em; helps readability on mobile */
+ul, ol{
+  margin: 0 0 1em;
+  padding-left: 1.2em;
 }
 
-/* Slight emphasis for the first paragraph after a section heading */
-h2 + p{
-  font-size: 1.04em;
-}
+li{ margin: 0.25em 0; }
 
-/* Horizontal rules (if you have any) */
-hr{
-  border: 0;
-  border-top: 1px solid var(--border);
-  margin: 1.8em 0;
-}
-
-/* Links */
 a{
   color: var(--link);
   text-decoration: underline;
-  text-decoration-thickness: 0.07em;  /* slightly clearer */
-  text-underline-offset: 0.18em;
+  text-underline-offset: 0.12em;
+  text-decoration-thickness: 0.08em;
 }
 
-a:hover{
+a:visited{ color: #5b21b6; }
+
+a:hover,
+a:focus{
   text-decoration-thickness: 0.12em;
 }
 
-a:focus-visible{
-  outline: 2px solid var(--link);
-  outline-offset: 3px;
-  border-radius: 6px;
+hr{
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 1.25em 0;
 }
 
-/* Selection */
-::selection{
-  background: rgba(29, 78, 216, 0.18);
+code, pre{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.92em;
 }
 
-/* Small screens: keep it comfortable without feeling oversized */
-@media (max-width: 380px){
-  body{ font-size: 17px; }
+pre{
+  overflow-x: auto;
+  padding: 0.9em 1em;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.55);
+}
+
+img{
+  max-width: 100%;
+  height: auto;
+  display: block;
 }
