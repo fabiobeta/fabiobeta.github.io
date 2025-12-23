@@ -1,15 +1,14 @@
-/* style.css — minimal, readable, mobile-first (full-width on phone) */
+/* style.css — minimal, readable, mobile-first */
 
 :root{
-  --bg: #fbf3df;          /* warm paper */
-  --text: #1f2937;        /* soft black */
+  --bg: #fbf3df;
+  --text: #1f2937;
   --muted: #6b7280;
   --link: #1d4ed8;
   --border: #e5e7eb;
 
-  /* layout + rhythm */
-  --pad: 1.25rem;         /* mobile side padding */
-  --max: 70ch;            /* desktop readable line length */
+  --pad: 1.25rem;
+  --max: 70ch;
 }
 
 html{
@@ -28,25 +27,24 @@ body{
   background: var(--bg);
   color: var(--text);
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-  font-size: 24px;        /* supersized mobile test */
+  font-size: 24px;
   line-height: 1.5;
+  text-rendering: optimizeLegibility;
 }
 
-/* Make content full width on mobile, with comfortable padding.
-   This is the fix for "paragraph stops early". */
+/* Mobile: full width + padding (prevents early right edge cutoff) */
 body > *{
   width: 100%;
-  max-width: none;        /* key: remove ch constraint on mobile */
+  max-width: none;
   margin: 0;
   padding-left: var(--pad);
   padding-right: var(--pad);
 }
 
-/* On larger screens, restore a readable column and center it */
 @media (min-width: 720px){
   body{
     font-size: 18px;
-    line-height: 1.6;
+    line-height: 1.65;
   }
 
   body > *{
@@ -58,31 +56,28 @@ body > *{
   }
 }
 
-/* Headings: proportionally larger than body */
 h1, h2, h3{
   line-height: 1.15;
   margin: 1.1em 0 0.5em;
   letter-spacing: -0.01em;
 }
 
-h1{ font-size: 1.55em; }  /* ~37px on mobile */
-h2{ font-size: 1.25em; }  /* ~30px on mobile */
-h3{ font-size: 1.10em; }
+h1{ font-size: 1.6em; }
+h2{ font-size: 1.3em; }
+h3{ font-size: 1.12em; }
 
-/* Paragraph spacing: tighter than default, still breathable */
 p{
-  margin: 0 0 0.85em;
+  margin: 0 0 0.9em;
+  max-width: 100%;
 }
 
-/* Lists */
 ul, ol{
-  margin: 0 0 0.95em;
+  margin: 0 0 1em;
   padding-left: 1.2em;
 }
 
 li{ margin: 0.25em 0; }
 
-/* Links: clear but not neon */
 a{
   color: var(--link);
   text-decoration: underline;
@@ -90,22 +85,19 @@ a{
   text-decoration-thickness: 0.08em;
 }
 
-a:visited{
-  color: #5b21b6;
-}
+a:visited{ color: #5b21b6; }
 
-a:hover, a:focus{
+a:hover,
+a:focus{
   text-decoration-thickness: 0.12em;
 }
 
-/* Optional: subtle section separation if you use <hr> */
 hr{
   border: 0;
   border-top: 1px solid var(--border);
   margin: 1.25em 0;
 }
 
-/* Code blocks if any appear */
 code, pre{
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 0.92em;
@@ -119,7 +111,6 @@ pre{
   background: rgba(255,255,255,0.55);
 }
 
-/* Images behave */
 img{
   max-width: 100%;
   height: auto;
