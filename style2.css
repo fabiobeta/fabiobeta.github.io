@@ -1,5 +1,6 @@
-/* style.css — editorial, warm, mobile-oversized test (24px body)
-   No HTML changes required
+/* style.css — editorial, warm, optimized for PERCEIVED size on mobile
+   Key idea: make mobile column narrower + slightly larger type + tighter leading
+   so it feels like MAD/FT reading mode without changing HTML.
 */
 
 :root{
@@ -37,13 +38,13 @@ body{
   background: var(--bg);
   color: var(--text);
   font-family: var(--sans);
-  font-size: 18px; /* desktop baseline */
+  font-size: 18px;        /* desktop baseline */
   line-height: 1.65;
   letter-spacing: -0.01em;
   padding: 18px 0 56px;
 }
 
-/* Centered reading column */
+/* Centered reading column (desktop/tablet) */
 body > *{
   max-width: var(--content);
   margin-left: auto;
@@ -92,14 +93,13 @@ h3{
   margin-top: 1.3em;
 }
 
-/* Lead paragraph */
 h1 + p{
   font-size: 19px;
   color: var(--muted);
   margin-top: .5em;
 }
 
-/* Paragraph rhythm */
+/* Body rhythm */
 p{ margin: .55em 0; }
 small{ color: var(--faint); }
 
@@ -126,19 +126,23 @@ code{
 }
 
 /* =========================
-   MOBILE: 24px BODY TEST (balanced headings)
+   MOBILE: PERCEIVED-SIZE OPTIMIZATION
    ========================= */
 @media (max-width: 640px){
-  :root{ --padX: 16px; }
+  :root{
+    --padX: 16px;
+  }
 
+  /* 1) Slightly larger base, 2) tighter leading, 3) narrower measure
+     -> feels much bigger than just increasing px */
   body{
-    font-size: 24px;     /* intentional overshoot */
-    line-height: 1.55;
+    font-size: 21px;
+    line-height: 1.52;
     padding-top: 10px;
     padding-bottom: 40px;
   }
 
-  /* Full-bleed on mobile */
+  /* Full-bleed: remove card metaphors */
   main{
     background: transparent;
     border: 0;
@@ -146,18 +150,22 @@ code{
     padding: 0;
   }
 
-  /* Rebalanced heading scale vs 24px body */
+  /* Narrower mobile column to increase perceived size */
+  body > *{
+    max-width: 36ch;   /* critical */
+  }
+
+  /* Mobile type scale (balanced vs 21px body) */
   h1{
-    font-size: 52px;
-    line-height: 1.06;
-    margin-top: .18em;
+    font-size: 44px;
+    line-height: 1.05;
+    margin-top: .22em;
     margin-bottom: .28em;
     letter-spacing: -0.03em;
   }
 
-  /* Lead paragraph: same size as body, but muted */
   h1 + p{
-    font-size: 24px;
+    font-size: 21px;   /* same as body; “dek” comes from color/spacing */
     line-height: 1.45;
     color: var(--muted);
     margin-top: .55em;
@@ -165,7 +173,7 @@ code{
 
   h2{
     font-family: var(--sans);
-    font-size: 30px;     /* must be > 24 */
+    font-size: 26px;
     font-weight: 850;
     line-height: 1.12;
     border-top: 0;
@@ -175,7 +183,6 @@ code{
     letter-spacing: -0.02em;
   }
 
-  /* Subtle rule after the header (not before) */
   h2::after{
     content: "";
     display: block;
@@ -184,17 +191,18 @@ code{
   }
 
   h3{
-    font-size: 26px;     /* slightly > body */
-    line-height: 1.18;
-    margin-top: 1.05em;
+    font-size: 23px;
+    line-height: 1.16;
+    margin-top: 1.0em;
     margin-bottom: .35em;
   }
 
+  /* Slightly tighter paragraph spacing reads more “editorial” */
   p{
-    margin: .62em 0;
+    margin: .58em 0;
   }
 
-  /* Lists feel too loose at 24px unless tightened slightly */
+  /* Lists at larger type need tighter item gaps */
   li{
     margin: .22em 0;
   }
