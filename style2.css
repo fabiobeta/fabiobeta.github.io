@@ -1,36 +1,30 @@
-/* style.css — minimal, readable, light-only (editorial / newspaper-ish)
-   Goal: clea vibe, no HTML changes required.
+/* style.css — editorial, newspaper-warm, readable
+   No HTML changes required
 */
 
 :root{
-  /* Warm paper palette */
-  --bg: #fff7e6;         /* newsprint */
-  --surface: #fffdf7;    /* slightly cleaner paper for blocks */
-  --text: #111827;       /* near-black */
-  --muted: #4b5563;
-  --faint: #6b7280;
+  /* Warm paper palette (clearly warm, not cool) */
+  --bg: #fff4dc;          /* warm newsprint */
+  --surface: #fffaf0;     /* inner paper */
+  --text: #0f172a;        /* deep ink */
+  --muted: #475569;
+  --faint: #64748b;
 
   --link: #0f56d6;
   --linkHover: #0b3ea8;
 
-  --border: #eadfca;     /* warm border */
-  --hairline: rgba(0,0,0,.08);
-
-  --shadow: 0 1px 0 rgba(17,24,39,.04), 0 10px 30px rgba(17,24,39,.06);
+  --border: #e6d6b8;
+  --hairline: rgba(15,23,42,.10);
 
   /* Typography */
-  --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
   --serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas;
 
   /* Layout */
-  --content: 74ch;
-  --padX: 18px;
-  --padY: 24px;
+  --content: 72ch;
+  --padX: 20px;
   --radius: 14px;
-
-  /* Rhythm */
-  --lh: 1.65;
 }
 
 html{
@@ -43,14 +37,13 @@ body{
   background: var(--bg);
   color: var(--text);
   font-family: var(--sans);
-  font-size: 17px;
-  line-height: var(--lh);
+  font-size: 18px;          /* IMPORTANT: clearly larger */
+  line-height: 1.68;
   letter-spacing: -0.01em;
-  padding-top: 18px;
-  padding-bottom: 54px;
+  padding: 16px 0 56px;
 }
 
-/* Works even if you have no <main> wrapper */
+/* Centered readable column */
 body > *{
   max-width: var(--content);
   margin-left: auto;
@@ -59,247 +52,99 @@ body > *{
   padding-right: var(--padX);
 }
 
-/* If your HTML uses <main>, give it a gentle editorial “sheet” */
+/* Desktop “sheet of paper” */
 main{
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding-top: 22px;
-  padding-bottom: 22px;
+  padding: 24px 0;
 }
 
-/* Headings: editorial, deliberate */
+/* Headings */
 h1, h2, h3{
   color: var(--text);
   line-height: 1.18;
   letter-spacing: -0.02em;
-  margin: 1.1em 0 .45em;
 }
 
 h1{
   font-family: var(--serif);
-  font-weight: 750;
-  font-size: clamp(34px, 3.4vw, 48px);
-  margin-top: .35em;
+  font-weight: 700;
+  font-size: clamp(36px, 3.5vw, 48px);
+  margin: .3em 0 .4em;
 }
 
 h2{
   font-family: var(--serif);
   font-weight: 700;
-  font-size: clamp(22px, 2.1vw, 28px);
-  margin-top: 1.55em;
+  font-size: 24px;
+  margin: 1.4em 0 .35em;
   padding-top: .35em;
   border-top: 1px solid var(--border);
 }
 
 h3{
-  font-family: var(--sans);
-  font-weight: 750;
-  font-size: 18px;
-  margin-top: 1.25em;
+  font-weight: 700;
+  font-size: 19px;
+  margin-top: 1.2em;
 }
 
-/* Title */
+/* Lead paragraph */
 h1 + p{
-  font-size: 18px;
+  font-size: 19px;
   color: var(--muted);
-  margin-top: .55em;
+  margin-top: .5em;
 }
 
-/* Text blocks: compact, readable */
+/* Paragraph rhythm */
 p{
-  margin: .6em 0;
-  color: var(--text);
-}
-p + p{
-  margin-top: .55em;
-}
-
-small{
-  color: var(--faint);
+  margin: .55em 0;
 }
 
 /* Links */
 a{
   color: var(--link);
-  text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 2px;
 }
 a:hover{
   color: var(--linkHover);
-  text-decoration-thickness: 2px;
 }
 
 /* Lists */
 ul, ol{
   margin: .7em 0 .7em 1.2em;
-  padding: 0;
 }
 li{
   margin: .3em 0;
 }
 
-/* Blockquotes: editorial callout */
-blockquote{
-  margin: 1.1em 0;
-  padding: .9em 1em;
-  background: rgba(15, 86, 214, .04);
-  border: 1px solid var(--border);
-  border-left: 4px solid rgba(15, 86, 214, .25);
-  border-radius: 10px;
-  color: var(--muted);
-}
-blockquote p{
-  margin: .35em 0;
-  color: inherit;
-}
-
-/* Code */
-code, kbd, samp{
-  font-family: var(--mono);
-  font-size: .92em;
-}
-code{
-  background: rgba(0,0,0,.04);
-  border: 1px solid rgba(0,0,0,.08);
-  padding: .12em .35em;
-  border-radius: 8px;
-}
-
-pre{
-  background: #0b1220;
-  color: #e5e7eb;
-  border-radius: 14px;
-  padding: 14px 16px;
-  overflow: auto;
-  border: 1px solid rgba(255,255,255,.08);
-  box-shadow: 0 10px 30px rgba(0,0,0,.15);
-  margin: 1em 0;
-}
-pre code{
-  background: transparent;
-  border: 0;
-  padding: 0;
-  color: inherit;
-}
-
-/* Horizontal rule */
-hr{
-  border: 0;
-  border-top: 1px solid var(--border);
-  margin: 1.6em 0;
-}
-
-/* Images */
-img{
-  max-width: 100%;
-  height: auto;
-  border-radius: 12px;
-  display: block;
-  margin: 1em 0;
-  border: 1px solid var(--border);
-  background: var(--surface);
-}
-
-/* Tables */
-table{
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1em 0;
-  font-size: 15px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-}
-th, td{
-  text-align: left;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--border);
-  vertical-align: top;
-}
-th{
-  background: rgba(0,0,0,.03);
-  color: var(--text);
-  font-weight: 750;
-}
-tr:last-child td{
-  border-bottom: 0;
-}
-
-/* Form elements */
-input, textarea, select, button{
-  font: inherit;
-}
-input, textarea, select{
-  width: 100%;
-  box-sizing: border-box;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-  outline: none;
-}
-input:focus, textarea:focus, select:focus{
-  border-color: rgba(15,86,214,.45);
-  box-shadow: 0 0 0 4px rgba(15,86,214,.12);
-}
-
-/* Accessibility: reduce motion */
-@media (prefers-reduced-motion: reduce){
-  *{
-    scroll-behavior: auto !important;
-    transition: none !important;
-    animation: none !important;
-  }
-}
-
-/* --- Mobile tuning (Pixel 6 Pro and similar) --- */
+/* Mobile: full-bleed, bigger, calmer */
 @media (max-width: 640px){
-  :root{
-    --padX: 16px;
-  }
-
   body{
-    font-size: 16.5px;
-    line-height: 1.62;
+    font-size: 18px;     /* stays large on mobile */
+    line-height: 1.65;
     padding-top: 10px;
-    padding-bottom: 32px;
   }
 
-  /* Full-bleed reading on mobile: remove “card” */
   main{
     background: transparent;
     border: 0;
-    box-shadow: none;
-    border-radius: 0;
-    padding-top: 0;
-    padding-bottom: 0;
+    padding: 0;
   }
 
   h1{
-    font-size: 32px;
-    margin-top: .25em;
-    margin-bottom: .35em;
-    letter-spacing: -0.015em;
+    font-size: 34px;
   }
 
-  /* Key fix: h2 divider treatment is too heavy on mobile */
   h2{
     font-family: var(--sans);
+    font-size: 19px;
     font-weight: 800;
-    font-size: 18px;
-    letter-spacing: -0.01em;
-    margin-top: 1.1em;
-    margin-bottom: .35em;
     border-top: 0;
-    padding-top: 0;
+    margin-top: 1.1em;
   }
 
-  /* Subtle separator *after* the header (lighter than “rule above”) */
   h2::after{
     content: "";
     display: block;
@@ -307,15 +152,7 @@ input:focus, textarea:focus, select:focus{
     border-bottom: 1px solid var(--hairline);
   }
 
-  h3{
-    font-size: 17px;
-  }
-
-  p{
-    margin: .52em 0;
-  }
-
   h1 + p{
-    font-size: 17px;
+    font-size: 18px;
   }
 }
